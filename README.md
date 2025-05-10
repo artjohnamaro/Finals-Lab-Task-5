@@ -34,5 +34,6 @@
 ## TASK 4 OUTPUT:
 ![Image](https://github.com/user-attachments/assets/43575a86-96e6-4ede-b69e-208a82ba7ec9)
 ## TASK 5  QUERY:
-
+![Image](https://github.com/user-attachments/assets/020e793a-a1b5-4762-b1cb-1f4dc68cde28)
 ## TASK 5 OUTPUT:
+![Image](https://github.com/user-attachments/assets/add60993-b9e8-4a4f-b6a7-060b069ea4c8)
