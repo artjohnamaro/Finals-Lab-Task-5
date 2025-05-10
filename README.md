@@ -37,3 +37,6 @@ In this portfolio, I showcase how I used SQL views, stored procedures, and funct
 ![Image](https://github.com/user-attachments/assets/020e793a-a1b5-4762-b1cb-1f4dc68cde28)
 ## TASK 5 OUTPUT:
 ![Image](https://github.com/user-attachments/assets/add60993-b9e8-4a4f-b6a7-060b069ea4c8)
+
+## DOWNLOAD FILE
+[FINAL LAB TASK 5.docx](https://github.com/user-attachments/files/20139024/FINAL.LAB.TASK.5.docx)
