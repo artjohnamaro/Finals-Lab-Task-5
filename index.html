@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finals Lab Task 5 | SQL Views and Procedures</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-light: #f7f9fc;
+      --card-dark: rgba(18, 25, 38, 0.95);
+      --card-light: rgba(255, 255, 255, 0.9);
+      --text-dark: #d8e1ef;
+      --text-light: #1e293b;
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3a0ca3;
+      --accent: #7209b7;
+      --success: #2ecc71;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 3rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: radial-gradient(circle at top right, rgba(76, 0, 247, 0.15), transparent 70%),
+                  radial-gradient(circle at bottom left, rgba(114, 9, 183, 0.15), transparent 70%);
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary-light), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.2rem;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+    }
+
+    .process-card {
+      background: var(--card-dark);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .process-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+
+    .step-title {
+      color: var(--primary-light);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .step-list {
+      list-style: none;
+      padding-left: 2rem;
+    }
+
+    .step-list li {
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .step-list li::before {
+      content: "•";
+      color: var(--primary-light);
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .image-card {
+      background: var(--card-dark);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .image-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .image-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 25, 38, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .image-card:hover .image-overlay {
+      opacity: 1;
+    }
+
+    .image-overlay span {
+      color: white;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 2px solid white;
+      border-radius: 8px;
+      background: rgba(67, 97, 238, 0.3);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .image-card:hover .image-overlay span {
+      transform: translateY(0);
+    }
+
+    .download-section {
+      margin-top: 3rem;
+      text-align: center;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .download-card {
+      background: var(--card-dark);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .download-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+      border-color: var(--primary-light);
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(67, 97, 238, 0.2);
+      color: var(--primary-light);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .download-btn:hover {
+      background: rgba(67, 97, 238, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .download-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--primary-light);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: 8px;
+      width: fit-content;
+      margin: 0 auto 1.5rem;
+    }
+
+    .download-hint i {
+      font-size: 1.25rem;
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 14, 23, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 2rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal.active {
+      display: flex;
+      animation: modalFadeIn 0.3s ease forwards;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 90vh;
+      position: relative;
+      animation: modalContentSlide 0.3s ease forwards;
+    }
+
+    @keyframes modalContentSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: -2rem;
+      right: -2rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      color: var(--primary-light);
+      transform: rotate(90deg);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+     
+      .image-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+     
+      .image-card {
+        aspect-ratio: 4/3;
+      }
+     
+      .download-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Finals Lab Task 5: SQL Views and Procedures</h1>
+      <p class="subtitle">In this portfolio, I showcase how I used SQL views, stored procedures, and functions to handle and work with database data. I included examples like using views to filter information, stored procedures to update records, and functions to pull specific data.</p>
+    </header>
+
+    <main>
+      <div class="process-card">
+        <h2 class="step-title"><i class="ph ph-list-numbers"></i>Step by Step Process</h2>
+        <ul class="step-list">
+          <li>CREATE A VIEW that will display the vendors_code, vendors name, product description p_indate, of all products with p_indate from 2002 onwards</li>
+          <li>CREATE a VIEW that will display all products whose price range is between 100-150</li>
+          <li>Create a VIEW that will COMPUTE for the (TOTAL_PRICE) of ALL PRODUCTS by getting the (P_ONHAND x P_PRICE) Sold by vendors with the following v_code (21344, 23119 and 24288)</li>
+          <li>CREATE a STORED PROCEDURE that WILL take a SINGLE PARAMETER and UPDATED the Name of Vendor 'Bryson,Inc.' to 'Bryson and Co'</li>
+          <li>CREATE A Function that will take 2 parameters(v_code and v_state) and display All the product description and price based on the parameters passed to the function</li>
+        </ul>
+      </div>
+
+      <div class="process-card">
+        <h2 class="step-title"><i class="ph ph-code"></i>Task 1: View for Products from 2002 Onwards</h2>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/15ceca83-6bea-4f97-a553-9ec5967b7135" alt="Task 1 Query">
+            <div class="image-overlay">
+              <span>View Query</span>
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/eb24af96-20ce-4d81-8778-b7782d68be8e" alt="Task 1 Output">
+            <div class="image-overlay">
+              <span>View Output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-card">
+        <h2 class="step-title"><i class="ph ph-code"></i>Task 2: View for Products Priced 100-150</h2>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/79c9c371-e0e5-41ce-9a56-7b2d59540f16" alt="Task 2 Query">
+            <div class="image-overlay">
+              <span>View Query</span>
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/084e60d2-073d-462e-8733-839082c1c6f7" alt="Task 2 Option Query">
+            <div class="image-overlay">
+              <span>Alternative Query</span>
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/13666c4c-81f6-456b-bb61-d94913483842" alt="Task 2 Output">
+            <div class="image-overlay">
+              <span>View Output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-card">
+        <h2 class="step-title"><i class="ph ph-code"></i>Task 3: View for Total Price Calculation</h2>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/8f1c5fed-e737-41b1-ba32-5ccd06ce7a95" alt="Task 3 Query">
+            <div class="image-overlay">
+              <span>View Query</span>
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/8c15aa4d-8f08-4c77-9aaf-ed35176a8715" alt="Task 3 Output">
+            <div class="image-overlay">
+              <span>View Output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-card">
+        <h2 class="step-title"><i class="ph ph-code"></i>Task 4: Stored Procedure to Update Vendor</h2>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/42c5597e-37b3-46e2-afaf-fe0834d56c0d" alt="Task 4 Query">
+            <div class="image-overlay">
+              <span>View Query</span>
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/43575a86-96e6-4ede-b69e-208a82ba7ec9" alt="Task 4 Output">
+            <div class="image-overlay">
+              <span>View Output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-card">
+        <h2 class="step-title"><i class="ph ph-code"></i>Task 5: Function with Parameters</h2>
+        <div class="image-grid">
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/020e793a-a1b5-4762-b1cb-1f4dc68cde28" alt="Task 5 Query">
+            <div class="image-overlay">
+              <span>View Query</span>
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="https://github.com/user-attachments/assets/add60993-b9e8-4a4f-b6a7-060b069ea4c8" alt="Task 5 Output">
+            <div class="image-overlay">
+              <span>View Output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="download-section">
+        <div class="download-hint">
+          <i class="ph ph-download-simple"></i>
+          <span>Download Project Files</span>
+        </div>
+        <div class="download-grid">
+          <div class="download-card">
+            <a href="https://github.com/user-attachments/files/20139024/FINAL.LAB.TASK.5.docx" class="download-btn" target="_blank">
+              <i class="ph ph-file-doc"></i>
+              Download Documentation
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <button class="close-modal">
+        <i class="ph ph-x"></i>
+      </button>
+      <img src="" alt="Modal Image" id="modalImage">
+    </div>
+  </div>
+
+  <script>
+    // Image Modal Functionality
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const closeBtn = document.querySelector('.close-modal');
+    const imageCards = document.querySelectorAll('.image-card');
+
+    imageCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const img = card.querySelector('img');
+        modalImg.src = img.src;
+        modalImg.alt = img.alt;
+        modal.classList.add('active');
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        modal.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
